@@ -10,13 +10,18 @@ namespace Project3
     {
         static void Main()
         {
-            Console.Write("Input batch number: ");
-            int batch = Convert.ToInt16(Console.ReadLine());
-
             var reaction = new EarningReaction();
-            reaction.Start(batch);
+            Console.Write("Input command: 'r' for report, numbers (1, 2, or 3) for groups ");
 
-            Console.WriteLine("Done");
+            string command = Console.ReadLine();
+            if (command == "r")
+                reaction.GenerateFinalReport();
+            else
+            {
+                int batch = Convert.ToInt16(command);
+                reaction.Process(batch);
+            }
+
         }
 
     }

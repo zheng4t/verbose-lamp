@@ -13,7 +13,9 @@ namespace Project3
 
         public double Delta { get; set; }
 
-        public List<double> MarketReaction { get; set; }
+        public double PriceBefore { get; set; }
+
+        public double PriceAfter { get; set; }
     }
 
     [Serializable()]
@@ -21,6 +23,7 @@ namespace Project3
     {
         public string Symbol { get; set; }
         public int Score { get; set; }
+        public DateTime NextRelease { get; set; }
         public List<EarningPrices> RawData { get; set; }
 
         public void CalculateScore()
@@ -28,7 +31,7 @@ namespace Project3
             double sum = 0;
             foreach (var d in RawData)
             {
-                d.Delta = Math.Abs(d.MarketReaction[1] / d.MarketReaction[0] - 1);
+                d.Delta = Math.Abs(d.PriceAfter / d.PriceBefore - 1);
                 sum += d.Delta;
             }
 
