@@ -23,7 +23,7 @@ namespace Project3
     {
         public string Symbol { get; set; }
         public int Score { get; set; }
-        public DateTime NextRelease { get; set; }
+        public string NextRelease { get; set; }
         public List<EarningPrices> RawData { get; set; }
 
         public void CalculateScore()

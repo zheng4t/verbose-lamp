@@ -41,6 +41,8 @@ namespace Project3
 
             dataCollection.Sort((x, y) => x.Score.CompareTo(y.Score));
             SerializeToFile(@"C:\finalresult.xml");
+
+            GenerateSummary(@"C:\summary.csv");
         }
 
         private void SerializeToFile(string filePath)
@@ -50,6 +52,15 @@ namespace Project3
             var x = new System.Xml.Serialization.XmlSerializer(dataCollection.GetType());
             x.Serialize(file, dataCollection);
             file.Close();
+        }
+
+        private void GenerateSummary(string filePath)
+        {
+            var summary = from data in dataCollection
+                          where data.RawData.Count > 0
+                          select data.Symbol + "," + Convert.ToString(data.Score) + "," + data.NextRelease;
+            
+            File.WriteAllLines(filePath, summary);
         }
 
         public void Process(int batch)
@@ -80,14 +91,16 @@ namespace Project3
 
         private EarningData GetMarketReaction(string symbol)
         {
-            var data = new EarningData()
-            {
-                Symbol = symbol,
-                RawData = new List<EarningPrices>()
-            };
+            Console.WriteLine(symbol);
 
-            List<DateTime> dates = GetEarningReleaseDates(symbol);
-            foreach (var d in dates)
+            var data = new EarningData();
+            data.Symbol = symbol;
+            data.RawData = new List<EarningPrices>();
+
+            var dates = GetEarningReleaseDates(symbol);
+            data.NextRelease = dates.Item2;
+
+            foreach (var d in dates.Item1)
             {
                 try
                 {
@@ -113,11 +126,10 @@ namespace Project3
             return data;
         }
 
-        private List<DateTime> GetEarningReleaseDates(string symbol)
+        private Tuple<List<DateTime>, string> GetEarningReleaseDates(string symbol)
         {
-            Console.WriteLine(symbol);
             var dates = new List<DateTime>();
-            DateTime nextDate;
+            string nextDate = "";
 
             try
             {
@@ -125,31 +137,39 @@ namespace Project3
                 HtmlDocument document = htmlWeb.Load(earningURL + symbol);
 
                 nextDate = GetNextReleaseDate(document, symbol);
-
-                HtmlNode node = document.GetElementbyId("showdata-div");
-                var divTable = node.Descendants().Where
-                    (d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains("genTable")).First();
-                var table = divTable.ChildNodes.Where(d => d.Name.Contains("table")).First();
-                foreach (var row in table.SelectNodes("th|tr"))
-                {
-                    dates.Add(DateTime.ParseExact(row.SelectNodes("td").ElementAt(1).InnerText, "d", CultureInfo.InvariantCulture));
-                }
+                dates = GetHistoricalReleaseDate(document, symbol);
             }
             catch
             {
                 Console.WriteLine("No release dates for " + symbol);
             }
-            return dates;
+
+            return new Tuple<List<DateTime>, string>(dates, nextDate);
         }
 
-        private DateTime GetNextReleaseDate(HtmlDocument document, string symbol)
+        private string GetNextReleaseDate(HtmlDocument document, string symbol)
         {
             var v = document.DocumentNode.SelectNodes("//body//h2").First();
             int posStart = v.InnerText.IndexOf(":") + 1;
             int posEnd = v.InnerText.IndexOf("\n", posStart);
-            string s = v.InnerText.Substring(posStart, posEnd - posStart).Trim();
 
-            return Convert.ToDateTime(s);  
+            return v.InnerText.Substring(posStart, posEnd - posStart).Trim(); 
+        }
+
+        private List<DateTime> GetHistoricalReleaseDate(HtmlDocument document, string symbol)
+        {
+            var dates = new List<DateTime>();
+
+            HtmlNode node = document.GetElementbyId("showdata-div");
+            var divTable = node.Descendants().Where
+                (d => d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains("genTable")).First();
+            var table = divTable.ChildNodes.Where(d => d.Name.Contains("table")).First();
+            foreach (var row in table.SelectNodes("th|tr"))
+            {
+                dates.Add(DateTime.ParseExact(row.SelectNodes("td").ElementAt(1).InnerText, "d", CultureInfo.InvariantCulture));
+            }
+
+            return dates;
         }
 
         private Tuple<double, double> GetPrice(string s, DateTime d)
