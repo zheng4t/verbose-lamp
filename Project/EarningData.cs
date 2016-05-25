@@ -35,6 +35,7 @@ namespace Project3
                 sum += d.Delta;
             }
 
+            sum += (4 - RawData.Count()) * (sum / RawData.Count());
             Score = (int)(sum * 100);
         }
     }
