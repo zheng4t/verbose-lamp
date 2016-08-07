@@ -22,6 +22,37 @@ namespace Project3
 
         private List<string> errorMessages = new List<string>();
 
+        public void UpdatePrice()
+        {
+            dataCollection = new List<EarningData>();
+            var x = new System.Xml.Serialization.XmlSerializer(typeof(List<EarningData>));
+            using (var fileStream = new FileStream(@"C:\finalresult.xml", FileMode.Open))
+            {
+                dataCollection = (List<EarningData>)x.Deserialize(fileStream);
+            }
+
+            foreach (var item in dataCollection)
+            {
+                foreach (var data in item.RawData)
+                {
+                    try
+                    {
+                        var prices = GetPrice(item.Symbol, data.ReleaseDate);
+                        data.PriceBefore = prices.Item1;
+                        data.PriceAfter = prices.Item2;
+                    }
+                    catch (Exception e)
+                    {
+                        string error = item.Symbol + " " + e.ToString();
+                        errorMessages.Add(error);
+                        Console.WriteLine("Error getting prices for " + error);
+                    }
+                }
+            }
+
+            SerializeToFile(@"C:\finalresultHL.xml");
+        }
+
         public void GenerateFinalReport()
         {
             dataCollection = new List<EarningData>();
@@ -182,10 +213,33 @@ namespace Project3
             XDocument doc = XDocument.Load(page);
             var quotes = doc.Root.Element("results").Elements("quote");
 
-            string beforePrice = quotes.Last().Element("Adj_Close").Value;
-            string afterPrice = quotes.ElementAt(quotes.Count() - 3).Element("Adj_Close").Value;
+            double beforePrice = Convert.ToDouble(quotes.Last().Element("Adj_Close").Value);
+            double afterPrice = GetAfterPrice(d, quotes, beforePrice);
 
-            return new Tuple<double, double>(Convert.ToDouble(beforePrice), Convert.ToDouble(afterPrice));
+            return new Tuple<double, double>(beforePrice, afterPrice);
+        }
+
+        private double GetAfterPrice(DateTime d, IEnumerable<XElement> quotes, double beforePrice)
+        {
+            double afterPrice1 = GetAfterOneDay(quotes.ElementAt(quotes.Count() - 3), beforePrice);
+            double afterPrice2 = GetAfterOneDay(quotes.ElementAt(quotes.Count() - 2), beforePrice);
+
+            if (Math.Abs(beforePrice - afterPrice1) > Math.Abs(beforePrice - afterPrice2))
+                return afterPrice1;
+            else
+                return afterPrice2;
+
+        }
+
+        private double GetAfterOneDay(XElement x, double beforePrice) 
+        {
+            double high = Convert.ToDouble(x.Element("High").Value);
+            double low = Convert.ToDouble(x.Element("Low").Value);
+
+            if (Math.Abs(beforePrice - high) > Math.Abs(beforePrice - low))
+                return high;
+            else
+                return low;
         }
     }
 }
