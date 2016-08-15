@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ArrayOfCandidate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Candidate>
+    <symbol>SLW</symbol>
+    <value>12.86B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>BABA</symbol>
+    <value>210.28B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>M</symbol>
+    <value>10.72B</value>
+  </Candidate>
+</ArrayOfCandidate>

@@ -28,9 +28,9 @@ namespace Project3
             GetWeeklyOptions();
 
             CandidateList = new List<Candidate>();
-            string date = "2016-Aug-05";
+            string date = "2016-Aug-12";
             GetCandidate(false, date);
-            GetCandidate(true, "2016-Aug-08");
+            GetCandidate(true, "2016-Aug-15");
 
             var file = System.IO.File.Create(@"C:\candidate.xml");
 
@@ -80,7 +80,7 @@ namespace Project3
 
                 if (c.value.EndsWith("B") && Convert.ToDouble(c.value.Substring(0, c.value.Length - 1)) > 10)
                 {
-                    if (Weeklys.Contains(c.symbol))
+           //         if (Weeklys.Contains(c.symbol))
                         CandidateList.Add(c);
                 }
             }

@@ -45,9 +45,11 @@ namespace Project3
                     {
                         string error = item.Symbol + " " + e.ToString();
                         errorMessages.Add(error);
-                        Console.WriteLine("Error getting prices for " + error);
+                        Console.WriteLine("Error getting prices for " + item.Symbol);
                     }
                 }
+
+                item.CalculateScore();
             }
 
             SerializeToFile(@"C:\finalresultHL.xml");

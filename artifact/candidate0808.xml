@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<ArrayOfCandidate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Candidate>
+    <symbol>CHTR</symbol>
+    <value>24.1B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>COH</symbol>
+    <value>11.51B</value>
+  </Candidate>
+</ArrayOfCandidate>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ArrayOfCandidate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Candidate>
+    <symbol>ATVI</symbol>
+    <value>29.81B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>LNKD</symbol>
+    <value>25.68B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>SYMC</symbol>
+    <value>12.87B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>PCLN</symbol>
+    <value>68.06B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>CTSH</symbol>
+    <value>35.23B</value>
+  </Candidate>
+  <Candidate>
+    <symbol>WY</symbol>
+    <value>24.18B</value>
+  </Candidate>
+</ArrayOfCandidate>
