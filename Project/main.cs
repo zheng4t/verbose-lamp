@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Project3
 {
+    public static class Constants
+    {
+        public const string ArtifactPath = @"..\..\..\artifact";
+    }
+
     class Program
     {
         static void Main()

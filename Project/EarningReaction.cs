@@ -26,7 +26,7 @@ namespace Project3
         {
             dataCollection = new List<EarningData>();
             var x = new System.Xml.Serialization.XmlSerializer(typeof(List<EarningData>));
-            using (var fileStream = new FileStream(@"C:\finalresult.xml", FileMode.Open))
+            using (var fileStream = new FileStream(Constants.ArtifactPath + @"\finalresult.xml", FileMode.Open))
             {
                 dataCollection = (List<EarningData>)x.Deserialize(fileStream);
             }
@@ -52,13 +52,13 @@ namespace Project3
                 item.CalculateScore();
             }
 
-            SerializeToFile(@"C:\finalresultHL.xml");
+            SerializeToFile(Constants.ArtifactPath + @"\finalresultHL.xml");
         }
 
         public void GenerateFinalReport()
         {
             dataCollection = new List<EarningData>();
-            string[] dirs = Directory.GetFiles(@"c:\", "result?.xml");
+            string[] dirs = Directory.GetFiles(Constants.ArtifactPath, "result?.xml");
 
             foreach (string dir in dirs)
             {
@@ -73,9 +73,9 @@ namespace Project3
             }
 
             dataCollection.Sort((x, y) => x.Score.CompareTo(y.Score));
-            SerializeToFile(@"C:\finalresult.xml");
+            SerializeToFile(Constants.ArtifactPath + @"\finalresult.xml");
 
-            GenerateSummary(@"C:\summary.csv");
+            GenerateSummary(Constants.ArtifactPath + @"\summary.csv");
         }
 
         private void SerializeToFile(string filePath)
@@ -105,7 +105,7 @@ namespace Project3
             int batchEnd = batch * numberPerPatch;
 
             int n = 0;
-            string[] readText = File.ReadAllLines(@"c:\russell 1000.txt");
+            string[] readText = File.ReadAllLines(Constants.ArtifactPath + @"\russell 1000.txt");
             foreach (string s in readText)
             {
                 n++;
@@ -113,7 +113,7 @@ namespace Project3
                     dataCollection.Add(GetMarketReaction(s));
             }
 
-            SerializeToFile(@"C:\result" + batch + ".xml");
+            SerializeToFile(Constants.ArtifactPath + @"\result" + batch + ".xml");
 
             using (StreamWriter outputFile = new StreamWriter(@"c:\errorLog.txt"))
             {
@@ -207,15 +207,21 @@ namespace Project3
 
         private Tuple<double, double> GetPrice(string s, DateTime d)
         {
+            DateTime startDate;
+            if (d.DayOfWeek == DayOfWeek.Monday)
+                startDate = d.AddDays(-3);
+            else
+                startDate = d.AddDays(-1);
+
             string page = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22" +
-                s.Replace('.', '-') + "%22%20and%20startDate%20%3D%20%22" + d.AddDays(-1).ToString("yyyy-MM-dd") +
+                s.Replace('.', '-') + "%22%20and%20startDate%20%3D%20%22" + startDate.ToString("yyyy-MM-dd") +
                 "%22%20and%20endDate%20%3D%20%22" + d.AddDays(10).ToString("yyyy-MM-dd") +
                 "%22&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
 
             XDocument doc = XDocument.Load(page);
             var quotes = doc.Root.Element("results").Elements("quote");
 
-            double beforePrice = Convert.ToDouble(quotes.Last().Element("Adj_Close").Value);
+            double beforePrice = Convert.ToDouble(quotes.Last().Element("Close").Value);
             double afterPrice = GetAfterPrice(d, quotes, beforePrice);
 
             return new Tuple<double, double>(beforePrice, afterPrice);

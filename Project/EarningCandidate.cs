@@ -28,11 +28,11 @@ namespace Project3
             GetWeeklyOptions();
 
             CandidateList = new List<Candidate>();
-            string date = "2016-Aug-12";
+            string date = "2016-Aug-17";
             GetCandidate(false, date);
-            GetCandidate(true, "2016-Aug-15");
+            GetCandidate(true, "2016-Aug-18");
 
-            var file = System.IO.File.Create(@"C:\candidate.xml");
+            var file = System.IO.File.Create(Constants.ArtifactPath + @"\candidate.xml");
 
             var x = new System.Xml.Serialization.XmlSerializer(CandidateList.GetType());
             x.Serialize(file, CandidateList);
@@ -42,7 +42,7 @@ namespace Project3
         private void GetWeeklyOptions()
         {
             Weeklys = new List<string>();
-            string[] readText = File.ReadAllLines(@"c:\weeklysmf.csv");
+            string[] readText = File.ReadAllLines(Constants.ArtifactPath + @"\weeklysmf.csv");
             foreach (string s in readText)
                 Weeklys.Add(s.Substring(0, s.IndexOf(',')));
         }
@@ -69,8 +69,8 @@ namespace Project3
                     continue;
 
                 string s = row.SelectNodes("td").ElementAt(1).InnerText;
-                int b = s.IndexOf('(') + 1;
-                int e = s.IndexOf(')');
+                int b = s.LastIndexOf('(') + 1;
+                int e = s.LastIndexOf(')');
 
                 Candidate c = new Candidate();
                 c.symbol = s.Substring(b, e - b);
